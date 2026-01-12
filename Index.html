@@ -30,6 +30,8 @@
             color: var(--text-main);
             font-family: var(--font-main);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Moving Background */
@@ -52,6 +54,7 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
+            flex: 1; /* Pushes footer down */
         }
 
         header {
@@ -140,22 +143,21 @@
             font-family: 'Consolas', monospace;
             line-height: 1.5;
             border: 1px solid rgba(255,255,255,0.05);
-            flex-grow: 1; /* Pushes buttons to bottom */
+            flex-grow: 1; 
             margin-bottom: 20px;
             max-height: 200px;
             overflow-y: auto;
         }
 
-        /* --- 5. ACTION BAR (NEW) --- */
+        /* --- 5. ACTION BAR --- */
         .action-bar {
             display: flex;
             gap: 10px;
             margin-top: auto;
         }
 
-        /* Main Copy Button */
         .btn-copy {
-            flex: 2; /* Takes up more space */
+            flex: 2;
             background: var(--text-main);
             color: var(--bg-dark);
             border: none;
@@ -172,7 +174,6 @@
         .btn-copy:hover { background: var(--accent); color: white; }
         .btn-copy:active { transform: scale(0.95); }
 
-        /* Icon Links */
         .link-group {
             display: flex;
             gap: 5px;
@@ -192,12 +193,33 @@
             border: 1px solid transparent;
         }
 
-        /* Specific Hover Colors */
         .btn-link:hover { transform: translateY(-2px); }
         .btn-link.gemini:hover { background: var(--brand-gemini); }
         .btn-link.chatgpt:hover { background: var(--brand-chatgpt); }
         .btn-link.sora:hover { background: var(--text-main); color: black; }
         .btn-link.banana:hover { background: var(--brand-banana); color: black; }
+
+        /* --- 6. DEVELOPER FOOTER --- */
+        .dev-footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
+        }
+
+        .dev-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: text-shadow 0.3s;
+        }
+
+        .dev-footer a:hover {
+            text-shadow: 0 0 15px var(--accent);
+        }
 
         /* Toast Notification */
         #toast {
@@ -233,6 +255,10 @@
         </div>
 </div>
 
+<footer class="dev-footer">
+    Developed by <a href="https://github.com/pro-haitham" target="_blank">@pro-haitham</a>
+</footer>
+
 <div id="toast">Prompt Copied!</div>
 
 <script>
@@ -251,8 +277,8 @@
     const links = {
         gemini: "https://gemini.google.com/",
         chatgpt: "https://chatgpt.com/",
-        sora: "https://openai.com/sora", // Or your preferred Sora access link
-        banana: "https://app.banana.dev/" // Or generic generic model link
+        sora: "https://openai.com/sora",
+        banana: "https://app.banana.dev/"
     };
 
     // --- 3. RENDER LOGIC ---
