@@ -80,13 +80,17 @@ h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#fff,#94a3b8
 .card h3{margin:0 0 15px;}
 .prompt-box{background:rgba(0,0,0,.35);padding:15px;border-radius:10px;font-family:Consolas,monospace;font-size:.9rem;line-height:1.6;color:#cbd5e1;white-space:pre-wrap;flex-grow:1;margin-bottom:20px;}
 
-.action-bar{display:flex;gap:10px;flex-wrap:wrap;}
-.btn-copy{flex:2;border:none;background:var(--text-main);color:var(--bg-dark);border-radius:10px;font-weight:700;cursor:pointer;padding:12px;}
+.action-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.btn-copy{flex:2;border:none;background:var(--text-main);color:var(--bg-dark);border-radius:10px;font-weight:700;cursor:pointer;padding:12px;transition:transform .2s;}
 .btn-copy:hover{background:var(--accent);color:#fff;}
+.btn-copy:active{transform:scale(0.95);}
 .link-group{display:flex;gap:8px;}
 .btn-link{width:44px;height:44px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.1);color:#fff;text-decoration:none;font-weight:700;}
 .btn-link.banana:hover{background:var(--brand-banana);color:#000;}
 .btn-link.sora:hover{background:#fff;color:#000;}
+
+.favorite-btn{font-size:1.2rem;transition:transform .3s;}
+.favorite-btn.clicked{transform:scale(1.3);}
 
 footer{text-align:center;padding:35px 0;color:var(--text-muted);border-top:1px solid rgba(255,255,255,.05);}
 
@@ -103,7 +107,7 @@ h1{font-size:2.2rem;}
 .grid{grid-template-columns:1fr;}
 .card{padding:20px;}
 .prompt-box{font-size:.95rem;}
-.action-bar{flex-direction:column;}
+.action-bar{flex-direction:column;align-items:stretch;}
 .btn-copy{width:100%;}
 .link-group{justify-content:space-between;}
 }
@@ -140,7 +144,7 @@ Developed by <a href="https://github.com/pro-haitham" target="_blank">@pro-haith
 </div>
 
 <script>
-// -------- PROMPTS --------
+// ---------------- PROMPTS ----------------
 const prompts=[
 {type:"Sora",title:"Cinematic Reflection",content:`A cinematic transformation of a mirror reflection photo.
 Preserve identity and facial features.
@@ -151,40 +155,76 @@ cinematic lighting, soft oil painting texture.
 NEGATIVE PROMPT:
 distorted face, extra eyes, blur, low quality.`}
 ];
-const links={sora:"https://sora.chatgpt.com/",banana:"https://gemini.google.com/"};
+
+const links={ sora:"https://sora.chatgpt.com/", banana:"https://gemini.google.com/" };
 const grid=document.getElementById("grid");
 const toast=document.getElementById("toast");
 const searchBar=document.getElementById("searchBar");
 let currentFilter="all";
 
-// -------- RENDER --------
+// ---------------- FAVORITES ----------------
+function getFavorites(){return JSON.parse(localStorage.getItem("mirrorArtFavorites")||"[]");}
+function toggleFavorite(title){
+    const fav=getFavorites();
+    if(fav.includes(title)){fav.splice(fav.indexOf(title),1);} 
+    else {fav.push(title);}
+    localStorage.setItem("mirrorArtFavorites",JSON.stringify(fav));
+}
+
+// ---------------- RENDER ----------------
 function render(){
     const searchValue=searchBar.value.toLowerCase();
+    const favorites=getFavorites();
     grid.innerHTML="";
     prompts
-    .filter(p=>(currentFilter==="all"||p.type===currentFilter)&&(p.title.toLowerCase().includes(searchValue)||p.content.toLowerCase().includes(searchValue)))
+    .filter(p=>{
+        let passesFilter=(currentFilter==="all"||p.type===currentFilter||(currentFilter==="favorites"&&favorites.includes(p.title)));
+        let passesSearch=p.title.toLowerCase().includes(searchValue)||p.content.toLowerCase().includes(searchValue);
+        return passesFilter&&passesSearch;
+    })
     .forEach(p=>{
         const card=document.createElement("div");
         card.className="card";
         card.innerHTML=`<div class="tag">${p.type}</div><h3>${p.title}</h3><div class="prompt-box">${p.content}</div>`;
-        const actionBar=document.createElement("div");actionBar.className="action-bar";
-        const copyBtn=document.createElement("button");copyBtn.className="btn-copy";copyBtn.textContent="Copy";
+        
+        const actionBar=document.createElement("div"); actionBar.className="action-bar";
+
+        // COPY BUTTON
+        const copyBtn=document.createElement("button");
+        copyBtn.className="btn-copy"; copyBtn.textContent="Copy";
         copyBtn.addEventListener("click",()=>copyPrompt(p.content));
-        const linkGroup=document.createElement("div");linkGroup.className="link-group";
+
+        // FAVORITE BUTTON
+        const favBtn=document.createElement("button");
+        favBtn.className="btn-copy favorite-btn";
+        favBtn.textContent=favorites.includes(p.title)?"★":"☆";
+        favBtn.title="Toggle Favorite";
+        favBtn.addEventListener("click",()=>{
+            favBtn.classList.add("clicked");
+            setTimeout(()=>favBtn.classList.remove("clicked"),300);
+            toggleFavorite(p.title);
+            render();
+        });
+
+        // LINK BUTTONS
+        const linkGroup=document.createElement("div"); linkGroup.className="link-group";
         linkGroup.innerHTML=`<a class="btn-link sora" href="${links.sora}" target="_blank">S</a>
         <a class="btn-link banana" href="${links.banana}" target="_blank">B</a>`;
-        actionBar.append(copyBtn,linkGroup);card.append(actionBar);grid.append(card);
+
+        actionBar.append(copyBtn,favBtn,linkGroup);
+        card.append(actionBar);
+        grid.append(card);
     });
 }
 
-// -------- COPY --------
+// ---------------- COPY ----------------
 function copyPrompt(text){
     navigator.clipboard.writeText(text);
     toast.classList.add("show");
     setTimeout(()=>toast.classList.remove("show"),2000);
 }
 
-// -------- FILTER --------
+// ---------------- FILTER ----------------
 document.querySelectorAll(".filter-btn").forEach(btn=>{
     btn.addEventListener("click",()=>{
         document.querySelector(".filter-btn.active").classList.remove("active");
@@ -194,10 +234,10 @@ document.querySelectorAll(".filter-btn").forEach(btn=>{
     });
 });
 
-// -------- SEARCH --------
+// ---------------- SEARCH ----------------
 searchBar.addEventListener("input",()=>render());
 
-// -------- INSTALL PROMPT --------
+// ---------------- INSTALL PROMPT ----------------
 let deferredPrompt;
 const installPromptDiv=document.getElementById("installPrompt");
 const btnInstall=document.getElementById("btnInstall");
@@ -214,7 +254,7 @@ btnInstall.addEventListener("click",async()=>{
     }
 });
 
-// -------- SERVICE WORKER --------
+// ---------------- SERVICE WORKER ----------------
 if("serviceWorker" in navigator){
     window.addEventListener("load",()=>{
         navigator.serviceWorker.register("./sw.js")
