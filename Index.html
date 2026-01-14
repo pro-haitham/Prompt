@@ -1,337 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mirror Art | Prompt Architect</title>
-    <style>
-        /* --- 1. SETTINGS & VARIABLES --- */
-        :root {
-            --bg-dark: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --accent: #8b5cf6; /* Violet */
-            --accent-glow: #8b5cf688;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: rgba(148, 163, 184, 0.1);
-            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            
-            /* Brand Colors for Buttons */
-            --brand-gemini: #4E86F5;
-            --brand-chatgpt: #10a37f;
-            --brand-sora: #000000;
-            --brand-banana: #facc15;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mirror Art | Prompt Architect</title>
 
-        /* --- 2. BASE STYLES --- */
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: var(--font-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b5cf6">
+<link rel="icon" href="icon-192.png">
 
-        /* Moving Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 50%);
-            z-index: -1;
-            animation: pulseBg 10s ease-in-out infinite alternate;
-        }
+<style>
+:root {
+    --bg-dark: #0f172a;
+    --bg-card: rgba(30,41,59,0.7);
+    --accent: #8b5cf6;
+    --accent-glow: #8b5cf688;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: rgba(148,163,184,0.1);
+    --font-main: 'Inter', system-ui, sans-serif;
+    --brand-banana: #facc15;
+}
 
-        @keyframes pulseBg {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.1); }
-        }
+body {
+    margin:0;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+body::before{
+    content:"";
+    position:fixed;
+    inset:-50%;
+    background:radial-gradient(circle,#1e1b4b,#0f172a 60%);
+    animation:pulseBg 10s ease-in-out infinite alternate;
+    z-index:-1;
+}
+@keyframes pulseBg { to{transform:scale(1.1);} }
 
-        /* --- 3. LAYOUT --- */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            flex: 1; /* Pushes footer down */
-        }
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
+    flex:1;
+}
+header{text-align:center;margin-bottom:40px;}
+h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.subtitle{color:var(--text-muted);font-size:1rem;}
 
-        header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
+#searchBar{
+    display:block;
+    margin:0 auto 25px auto;
+    width:90%;
+    max-width:400px;
+    padding:8px 15px;
+    border-radius:25px;
+    border:none;
+    font-size:.95rem;
+}
 
-        h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-        }
+.filter-bar{display:flex;gap:10px;justify-content:center;margin-bottom:35px;overflow-x:auto;padding-bottom:5px;}
+.filter-btn{
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    padding:8px 18px;
+    border-radius:999px;
+    cursor:pointer;
+    white-space:nowrap;
+}
+.filter-btn.active{background:var(--accent);color:#fff;box-shadow:0 0 15px var(--accent-glow);}
 
-        p.subtitle { color: var(--text-muted); margin-top: 10px; }
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:25px;}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:25px;backdrop-filter:blur(20px);display:flex;flex-direction:column;}
+.tag{color:var(--accent);font-size:.7rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;}
+.card h3{margin:0 0 15px;}
+.prompt-box{background:rgba(0,0,0,.35);padding:15px;border-radius:10px;font-family:Consolas,monospace;font-size:.9rem;line-height:1.6;color:#cbd5e1;white-space:pre-wrap;flex-grow:1;margin-bottom:20px;}
 
-        /* Filter Bar */
-        .filter-bar {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
+.action-bar{display:flex;gap:10px;flex-wrap:wrap;}
+.btn-copy{flex:2;border:none;background:var(--text-main);color:var(--bg-dark);border-radius:10px;font-weight:700;cursor:pointer;padding:12px;}
+.btn-copy:hover{background:var(--accent);color:#fff;}
+.link-group{display:flex;gap:8px;}
+.btn-link{width:44px;height:44px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.1);color:#fff;text-decoration:none;font-weight:700;}
+.btn-link.banana:hover{background:var(--brand-banana);color:#000;}
+.btn-link.sora:hover{background:#fff;color:#000;}
 
-        .filter-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 8px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-        }
+footer{text-align:center;padding:35px 0;color:var(--text-muted);border-top:1px solid rgba(255,255,255,.05);}
 
-        .filter-btn.active {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
+#toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(20px);background:#10b981;padding:10px 25px;border-radius:30px;opacity:0;transition:.3s;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-        /* --- 4. CARD DESIGN --- */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
-        }
+.install-prompt{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--accent);color:#fff;padding:15px 20px;border-radius:12px;display:flex;gap:15px;align-items:center;font-weight:600;opacity:0;pointer-events:none;transition:all .5s ease;box-shadow:0 10px 25px rgba(0,0,0,.4);}
+.install-prompt.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.install-prompt button{background:#fff;color:var(--accent);border:none;border-radius:8px;padding:8px 15px;cursor:pointer;font-weight:bold;}
 
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 25px;
-            backdrop-filter: blur(20px);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            border-color: rgba(139, 92, 246, 0.3);
-        }
-
-        .tag {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: var(--accent);
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .card h3 { margin: 0 0 15px 0; color: #fff; font-size: 1.3rem; }
-
-        .prompt-box {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            color: #cbd5e1;
-            font-size: 0.9rem;
-            font-family: 'Consolas', monospace;
-            line-height: 1.5;
-            border: 1px solid rgba(255,255,255,0.05);
-            flex-grow: 1; 
-            margin-bottom: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        /* --- 5. ACTION BAR --- */
-        .action-bar {
-            display: flex;
-            gap: 10px;
-            margin-top: auto;
-        }
-
-        .btn-copy {
-            flex: 2;
-            background: var(--text-main);
-            color: var(--bg-dark);
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: 0.2s;
-        }
-        
-        .btn-copy:hover { background: var(--accent); color: white; }
-        .btn-copy:active { transform: scale(0.95); }
-
-        .link-group {
-            display: flex;
-            gap: 5px;
-        }
-
-        .btn-link {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .btn-link:hover { transform: translateY(-2px); }
-        .btn-link.gemini:hover { background: var(--brand-gemini); }
-        .btn-link.chatgpt:hover { background: var(--brand-chatgpt); }
-        .btn-link.sora:hover { background: var(--text-main); color: black; }
-        .btn-link.banana:hover { background: var(--brand-banana); color: black; }
-
-        /* --- 6. DEVELOPER FOOTER --- */
-        .dev-footer {
-            text-align: center;
-            padding: 40px 0;
-            margin-top: 40px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(5px);
-        }
-
-        .dev-footer a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            transition: text-shadow 0.3s;
-        }
-
-        .dev-footer a:hover {
-            text-shadow: 0 0 15px var(--accent);
-        }
-
-        /* Toast Notification */
-        #toast {
-            position: fixed; bottom: 30px; left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: #10b981; color: white;
-            padding: 10px 25px; border-radius: 30px;
-            opacity: 0; pointer-events: none;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            font-weight: 600;
-        }
-        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    </style>
+@media(max-width:768px){
+h1{font-size:2.2rem;}
+.container{padding:30px 16px;}
+.grid{grid-template-columns:1fr;}
+.card{padding:20px;}
+.prompt-box{font-size:.95rem;}
+.action-bar{flex-direction:column;}
+.btn-copy{width:100%;}
+.link-group{justify-content:space-between;}
+}
+</style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>Mirror Art</h1>
-        <p class="subtitle">The Ultimate Prompt Library</p>
-    </header>
+<header>
+<h1>Mirror Art</h1>
+<p class="subtitle">The Ultimate Prompt Library</p>
+</header>
 
-    <div class="filter-bar">
-        <button class="filter-btn active" onclick="filterPrompts('all', this)">All</button>
-        <button class="filter-btn" onclick="filterPrompts('Gemini', this)">Gemini</button>
-        <button class="filter-btn" onclick="filterPrompts('Banana', this)">Banana</button>
-        <button class="filter-btn" onclick="filterPrompts('Sora', this)">Sora</button>
-        <button class="filter-btn" onclick="filterPrompts('Masters', this)">Masters</button>
-    </div>
+<input type="text" id="searchBar" placeholder="Search prompts...">
 
-    <div class="grid" id="grid">
-        </div>
+<div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="Sora">Sora</button>
+    <button class="filter-btn" data-filter="Banana">Banana</button>
 </div>
 
-<footer class="dev-footer">
-    Developed by <a href="https://github.com/pro-haitham" target="_blank">@pro-haitham</a>
+<div class="grid" id="grid"></div>
+</div>
+
+<footer>
+Developed by <a href="https://github.com/pro-haitham" target="_blank">@pro-haitham</a>
 </footer>
 
 <div id="toast">Prompt Copied!</div>
 
+<div id="installPrompt" class="install-prompt">
+<span>Install Mirror Art App for quick access!</span>
+<button id="btnInstall">Install</button>
+</div>
+
 <script>
-    // --- 1. PROMPT DATA ---
-    const prompts = [
-        { id: 1, type: "Gemini", title: "Fine Art Mirror", content: "Use the uploaded image as the primary reference.\nPreserve identity, facial structure, and expression accurately.\nTransform this mirror reflection photo into a fine art portrait.\nSoft oil painting texture, elegant brush strokes, cinematic lighting.\nWarm tones, shallow depth of field.\nThe reflection should feel artistic but realistic.\nNo Face distortion, no extra people, no exaggerated features.\nMuseum-quality artwork." },
-        { id: 2, type: "Gemini", title: "Dream / Magical", content: "Use the uploaded image as the primary reference.\nPreserve identity, facial structure, and expression accurately.\nReimagine this mirror reflection as a dreamy artistic scene.\nSoft glowing light, surreal yet gentle atmosphere.\nPainterly style, pastel highlights, emotional mood.\nThe reflection feels magical but the face remains realistic.\nHigh detail, artistic depth, no distortion." },
-        { id: 3, type: "Gemini", title: "Modern Dark Art", content: "Use the uploaded image as the primary reference.\nPreserve identity, facial structure, and expression accurately.\nConvert this mirror reflection into a modern digital art piece.\nHigh contrast lighting, shadows, moody atmosphere.\nMinimalist background, gallery style composition.\nSharp facial details, dramatic look.\nProfessional contemporary artwork." },
-        { id: 4, type: "Banana", title: "Artistic Portrait (Best)", content: "Mirror reflection portrait, artistic realism, cinematic lighting,\nsoft oil painting texture, elegant brush strokes.\nNatural flare, correct proportions, high detail,\nprofessional art, reality.\n\nNEGATIVE PROMPT:\ndistorted face, extra eyes, extra hands, blur, low quality,\ncartoonish, unrealistic proportions, duplicated face." },
-        { id: 5, type: "Sora", title: "Cinematic Reflection", content: "A cinematic transformation of mirror reflection photo.\nThe person's identity and Facial Features remain accurate.\nSoft cinematic lighting, shallow depth of field,\nemotional tone, artistic realism.\nThe reflection feels poetic and expressive,\nLike a scene from an art movie.\nHigh quality, professional, visually stunning." },
-        { id: 6, type: "Masters", title: "Picasso Cubism", content: "Use the uploaded image as the primary reference.\nPreserve identity, facial structure.\nRebuild the reflection in cubist style inspired by Pablo Picasso.\nFragment the face into geometric planes while keeping identity recognizable.\nMultiple perspectives within a single portrait, bold abstract shapes." },
-        { id: 7, type: "Masters", title: "Da Vinci Sfumato", content: "Use the uploaded image as the primary reference.\nRebuild the reflection in a Renaissance oil painting style inspired by Leonardo da Vinci.\nSoft sfumato transitions, delicate blending of light and shadow.\nSubtle gradients, natural skin tones, calm and introspective expression." }
-    ];
+// -------- PROMPTS --------
+const prompts=[
+{type:"Sora",title:"Cinematic Reflection",content:`A cinematic transformation of a mirror reflection photo.
+Preserve identity and facial features.
+Soft cinematic lighting, shallow depth of field.
+Emotional, poetic, artistic realism.`},
+{type:"Banana",title:"Artistic Portrait (Best)",content:`Mirror reflection portrait, artistic realism,
+cinematic lighting, soft oil painting texture.
+NEGATIVE PROMPT:
+distorted face, extra eyes, blur, low quality.`}
+];
+const links={sora:"https://sora.chatgpt.com/",banana:"https://gemini.google.com/"};
+const grid=document.getElementById("grid");
+const toast=document.getElementById("toast");
+const searchBar=document.getElementById("searchBar");
+let currentFilter="all";
 
-    // --- 2. LINKS CONFIGURATION ---
-    const links = {
-        gemini: "https://gemini.google.com/",
-        chatgpt: "https://chatgpt.com/",
-        sora: "https://openai.com/sora",
-        banana: "https://app.banana.dev/"
-    };
+// -------- RENDER --------
+function render(){
+    const searchValue=searchBar.value.toLowerCase();
+    grid.innerHTML="";
+    prompts
+    .filter(p=>(currentFilter==="all"||p.type===currentFilter)&&(p.title.toLowerCase().includes(searchValue)||p.content.toLowerCase().includes(searchValue)))
+    .forEach(p=>{
+        const card=document.createElement("div");
+        card.className="card";
+        card.innerHTML=`<div class="tag">${p.type}</div><h3>${p.title}</h3><div class="prompt-box">${p.content}</div>`;
+        const actionBar=document.createElement("div");actionBar.className="action-bar";
+        const copyBtn=document.createElement("button");copyBtn.className="btn-copy";copyBtn.textContent="Copy";
+        copyBtn.addEventListener("click",()=>copyPrompt(p.content));
+        const linkGroup=document.createElement("div");linkGroup.className="link-group";
+        linkGroup.innerHTML=`<a class="btn-link sora" href="${links.sora}" target="_blank">S</a>
+        <a class="btn-link banana" href="${links.banana}" target="_blank">B</a>`;
+        actionBar.append(copyBtn,linkGroup);card.append(actionBar);grid.append(card);
+    });
+}
 
-    // --- 3. RENDER LOGIC ---
-    const grid = document.getElementById('grid');
+// -------- COPY --------
+function copyPrompt(text){
+    navigator.clipboard.writeText(text);
+    toast.classList.add("show");
+    setTimeout(()=>toast.classList.remove("show"),2000);
+}
 
-    function render(filter = 'all') {
-        grid.innerHTML = '';
-        prompts.forEach(p => {
-            if (filter === 'all' || p.type === filter) {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="tag">${p.type}</div>
-                    <h3>${p.title}</h3>
-                    <div class="prompt-box">${p.content}</div>
-                    
-                    <div class="action-bar">
-                        <button class="btn-copy" onclick="copy('${p.content.replace(/\n/g, '\\n')}')">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
-                            Copy
-                        </button>
-                        
-                        <div class="link-group">
-                            <a href="${links.gemini}" target="_blank" class="btn-link gemini" title="Open Gemini">G</a>
-                            <a href="${links.chatgpt}" target="_blank" class="btn-link chatgpt" title="Open ChatGPT">C</a>
-                            <a href="${links.sora}" target="_blank" class="btn-link sora" title="Open Sora">S</a>
-                            <a href="${links.banana}" target="_blank" class="btn-link banana" title="Open Banana">B</a>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            }
-        });
+// -------- FILTER --------
+document.querySelectorAll(".filter-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+        document.querySelector(".filter-btn.active").classList.remove("active");
+        btn.classList.add("active");
+        currentFilter=btn.dataset.filter;
+        render();
+    });
+});
+
+// -------- SEARCH --------
+searchBar.addEventListener("input",()=>render());
+
+// -------- INSTALL PROMPT --------
+let deferredPrompt;
+const installPromptDiv=document.getElementById("installPrompt");
+const btnInstall=document.getElementById("btnInstall");
+window.addEventListener('beforeinstallprompt',(e)=>{
+    e.preventDefault();
+    deferredPrompt=e;
+    installPromptDiv.classList.add("show");
+});
+btnInstall.addEventListener("click",async()=>{
+    installPromptDiv.classList.remove("show");
+    if(deferredPrompt){
+        deferredPrompt.prompt();
+        deferredPrompt=null;
     }
+});
 
-    // --- 4. INTERACTIONS ---
-    function filterPrompts(type, btn) {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        render(type);
-    }
+// -------- SERVICE WORKER --------
+if("serviceWorker" in navigator){
+    window.addEventListener("load",()=>{
+        navigator.serviceWorker.register("./sw.js")
+        .then(reg=>console.log("SW Registered:",reg.scope))
+        .catch(err=>console.log("SW Registration Failed:",err));
+    });
+}
 
-    function copy(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        });
-    }
-
-    // Start
-    render();
+render();
 </script>
-
 </body>
 </html>
